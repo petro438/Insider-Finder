@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insider Tracker — Polymarket Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00c358;
+  --green-light: #e6f9ef;
+  --green-mid: #b3ecd0;
+  --red: #d93025;
+  --red-light: #fce8e6;
+  --amber: #e37400;
+  --amber-light: #fef3e2;
+  --blue: #1a73e8;
+  --blue-light: #e8f0fe;
+  --bg: #f8f9fa;
+  --bg2: #ffffff;
+  --border: #dadce0;
+  --border2: #e8eaed;
+  --text: #202124;
+  --text-2: #5f6368;
+  --text-3: #9aa0a6;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --header-h: 48px;
+  --tab-h: 36px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ── Header ── */
+#header {
+  height: var(--header-h);
+  background: var(--bg2);
+  border-bottom: 2px solid var(--green);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.brand-box {
+  width: 24px; height: 24px;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px; font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.brand-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.brand-sep {
+  color: var(--border);
+  font-size: 18px;
+  font-weight: 100;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+/* ── Tab bar ── */
+#tabbar {
+  height: var(--tab-h);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 16px;
+  gap: 0;
+}
+
+.tab {
+  height: 32px;
+  padding: 0 14px;
+  display: flex; align-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color 0.1s;
+  user-select: none;
+}
+
+.tab:hover { color: var(--text); }
+
+.tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+
+/* ── Layout ── */
+#content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.pane { display: none; }
+.pane.active { display: block; }
+
+/* ── Section header (DataGolf style) ── */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--green);
+  color: #fff;
+  padding: 2px 8px;
+}
+
+.section-desc {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+.section-meta {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+/* ── Input row ── */
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.input-row input {
+  flex: 1;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 0 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-row input:focus { border-color: var(--green); }
+.input-row input::placeholder { color: var(--text-3); }
+
+.btn {
+  height: 32px;
+  padding: 0 16px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.1s;
+}
+
+.btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--bg2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover { background: var(--bg); opacity: 1; border-color: var(--text-2); }
+
+/* ── Data table ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.data-table th {
+  background: #f1f3f4;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border2);
+  padding: 5px 10px;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.data-table th:last-child { border-right: none; }
+
+.data-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border2);
+  border-right: 1px solid var(--border2);
+  vertical-align: middle;
+}
+
+.data-table td:last-child { border-right: none; }
+
+.data-table tr:last-child td { border-bottom: none; }
+
+.data-table tr:hover td { background: #f8f9fa; }
+
+.data-table .mono { font-family: var(--mono); }
+.data-table .num { font-family: var(--mono); text-align: right; }
+.data-table .center { text-align: center; }
+
+/* ── Value formatting ── */
+.val-pos { color: var(--green); font-family: var(--mono); font-weight: 600; }
+.val-neg { color: var(--red); font-family: var(--mono); font-weight: 600; }
+.val-neutral { color: var(--text); font-family: var(--mono); }
+
+/* ── Bar indicator (DataGolf style) ── */
+.bar-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bar-track {
+  width: 60px;
+  height: 8px;
+  background: var(--border2);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.bar-fill {
+  position: absolute;
+  left: 0; top: 0; height: 100%;
+  transition: width 0.4s ease;
+}
+
+.bar-fill.green { background: var(--green); }
+.bar-fill.red { background: var(--red); }
+.bar-fill.amber { background: var(--amber); }
+.bar-fill.blue { background: var(--blue); }
+
+.bar-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  white-space: nowrap;
+  min-width: 36px;
+}
+
+/* ── Flag chips ── */
+.flags {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.flag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.flag-red { background: var(--red-light); color: var(--red); }
+.flag-green { background: var(--green-light); color: #0a7a3a; }
+.flag-amber { background: var(--amber-light); color: var(--amber); }
+.flag-blue { background: var(--blue-light); color: var(--blue); }
+.flag-gray { background: #f1f3f4; color: var(--text-2); }
+
+/* ── Address ── */
+.addr {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.addr a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.addr a:hover { text-decoration: underline; }
+
+/* ── Score badge ── */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.score-high { background: var(--green-light); color: #0a7a3a; }
+.score-mid { background: var(--amber-light); color: var(--amber); }
+.score-low { background: #f1f3f4; color: var(--text-2); }
+
+/* ── Market info card ── */
+.market-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.market-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.market-card-meta {
+  display: flex;
+  gap: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.market-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.market-card-stat .big {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.market-card-stat .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Empty / loading states ── */
+.state-row {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+
+.spinner-inline {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border: 1.5px solid var(--border);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Status bar ── */
+#statusbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 24px;
+  background: #202124;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #9aa0a6;
+  z-index: 200;
+  transition: opacity 0.3s;
+}
+
+#statusbar.hidden { opacity: 0; pointer-events: none; }
+#statusbar .status-green { color: var(--green); }
+#statusbar .status-step { color: #e8eaed; }
+
+/* ── Two-col layout for specialists ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.sidebar-filters {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 12px;
+}
+
+.filter-group {
+  margin-bottom: 14px;
+}
+
+.filter-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: background 0.1s;
+}
+
+.filter-option:hover { background: var(--bg); }
+
+.filter-option input[type=checkbox] {
+  accent-color: var(--green);
+  width: 12px; height: 12px;
+}
+
+.filter-option .cat-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Wallet profile ── */
+.wallet-profile {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.wp-stat {
+  background: var(--bg2);
+  padding: 10px 14px;
+}
+
+.wp-stat .wp-val {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.wp-stat .wp-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Category colors ── */
+.cat-Politics { color: #1a73e8; }
+.cat-Sports { color: #0a7a3a; }
+.cat-Crypto { color: #e37400; }
+.cat-Economics { color: #7b1fa2; }
+.cat-Entertainment { color: #c2185b; }
+.cat-Health { color: #d93025; }
+.cat-Tech { color: #1565c0; }
+.cat-Other { color: #5f6368; }
+.cat-Unknown { color: #9aa0a6; }
+
+.dot-Politics { background: #1a73e8; }
+.dot-Sports { background: #0a7a3a; }
+.dot-Crypto { background: #e37400; }
+.dot-Economics { background: #7b1fa2; }
+.dot-Entertainment { background: #c2185b; }
+.dot-Health { background: #d93025; }
+.dot-Tech { background: #1565c0; }
+.dot-Other { background: #5f6368; }
+.dot-Unknown { background: #9aa0a6; }
+
+body { padding-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="brand">
+    <div class="brand-box">IT</div>
+    <div class="brand-name">Insider Tracker</div>
+    <div class="brand-sep">|</div>
+    <div class="brand-sub">Polymarket Wallet Intelligence</div>
+  </div>
+</div>
+
+<div id="tabbar">
+  <div class="tab active" data-tab="market" onclick="switchTab('market')">Market Lookup</div>
+  <div class="tab" data-tab="wallet" onclick="switchTab('wallet')">Wallet Lookup</div>
+  <div class="tab" data-tab="specialists" onclick="switchTab('specialists')">Specialists</div>
+  <div class="tab" data-tab="fade" onclick="switchTab('fade')">Fade List</div>
+</div>
+
+<div id="content">
+
+  <!-- ── TAB 1: Market Lookup ── -->
+  <div class="pane active" id="pane-market">
+    <div class="input-row" style="margin-top:16px">
+      <input type="text" id="marketInput"
+        placeholder="Paste Polymarket URL or condition ID (0x...)  e.g. https://polymarket.com/event/... or 0xdd22472e..."
+        onkeydown="if(event.key==='Enter') lookupMarket()">
+      <button class="btn" onclick="lookupMarket()" id="marketBtn">Look Up</button>
+      <button class="btn btn-secondary" onclick="clearMarket()">Clear</button>
+    </div>
+
+    <div id="marketResult"></div>
+  </div>
+
+  <!-- ── TAB 2: Wallet Lookup ── -->
+  <div class="pane" id="pane-wallet">
+    <div class="input-row" style="margin-top:16px">
+      <input type="text" id="walletInput"
+        placeholder="Paste wallet address (0x...)"
+        onkeydown="if(event.key==='Enter') lookupWallet()">
+      <button class="btn" onclick="lookupWallet()" id="walletBtn">Look Up</button>
+      <button class="btn btn-secondary" onclick="clearWallet()">Clear</button>
+    </div>
+
+    <div id="walletResult"></div>
+  </div>
+
+  <!-- ── TAB 3: Specialists ── -->
+  <div class="pane" id="pane-specialists">
+    <div style="margin-top:16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="runScan()" id="specBtn">▶ Run Scan</button>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--text-3)">
+        High-volume wallets seeded by total spend · true lifetime PnL · category concentration
+      </span>
+    </div>
+    <div id="specialistResult"></div>
+  </div>
+
+  <!-- ── TAB 4: Fade List ── -->
+  <div class="pane" id="pane-fade">
+    <div style="margin-top:16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-secondary" style="border-color:var(--red);color:var(--red)" onclick="runScan()" id="fadeBtn">▶ Run Scan</button>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--text-3)">
+        High-volume wallets with consistent losses · bet against these
+      </span>
+    </div>
+    <div id="fadeResult"></div>
+  </div>
+
+</div>
+
+<div id="statusbar" class="hidden">
+  <div class="spinner-inline"></div>
+  <span class="status-step" id="statusStep">Loading...</span>
+  <span id="statusDetail"></span>
+</div>
+
+<script type="module">
+import {
+  fetchObscureMarkets,
+  fetchWalletSplits,
+  fetchMarketMetadataForTokens,
+  scoreSpecialist,
+  ENDPOINTS,
+  THRESHOLDS,
+} from './queries.js';
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `$${(n/1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${(n/1_000).toFixed(0)}K`;
+  return `$${n.toFixed(0)}`;
+}
+
+function fmtPct(n) {
+  if (n === null || n === undefined) return '—';
+  return `${n.toFixed(1)}%`;
+}
+
+function shortAddr(addr) {
+  return addr.slice(0,6) + '…' + addr.slice(-4);
+}
+
+function addrLink(addr) {
+  return `<a href="https://polymarket.com/profile/${addr}" target="_blank">${shortAddr(addr)}</a>`;
+}
+
+function exploreBtn(addr) {
+  return `<button class="btn btn-secondary" style="height:22px;padding:0 8px;font-size:9px" onclick="exploreWallet('${addr}')">Explore ↗</button>`;
+}
+
+window.exploreWallet = function(addr) {
+  document.getElementById('walletInput').value = addr;
+  switchTab('wallet');
+  lookupWallet();
+};
+
+function daysAgo(ts) {
+  if (!ts) return '—';
+  return Math.round((Date.now()/1000 - ts) / 86400) + 'd ago';
+}
+
+function setStatus(step, detail='') {
+  const bar = document.getElementById('statusbar');
+  bar.classList.remove('hidden');
+  document.getElementById('statusStep').textContent = step;
+  document.getElementById('statusDetail').textContent = detail;
+}
+
+function clearStatus() {
+  setTimeout(() => document.getElementById('statusbar').classList.add('hidden'), 1500);
+}
+
+async function rest(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function gql(endpoint, query, variables={}) {
+  const res = await fetch(endpoint, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({query, variables}),
+  });
+  const json = await res.json();
+  if (json.errors) throw new Error(json.errors[0].message);
+  return json.data;
+}
+
+function inferCategory(title) {
+  if (!title) return 'Unknown';
+  const t = title.toLowerCase();
+  if (/nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|epl|champions league|premier league|la liga|bundesliga|serie a|mls|fifa|world cup|match|win on|beat|vs\.|versus/.test(t)) return 'Sports';
+  if (/trump|biden|harris|election|president|congress|senate|republican|democrat|vote|ballot|nomination|governor|minister|parliament/.test(t)) return 'Politics';
+  if (/bitcoin|btc|eth|ethereum|crypto|solana|coinbase|binance|defi|token|blockchain/.test(t)) return 'Crypto';
+  if (/fed|federal reserve|interest rate|gdp|inflation|recession|cpi|unemployment|economy/.test(t)) return 'Economics';
+  if (/oscar|emmy|grammy|celebrity|taylor swift|kardashian|reality tv|survivor|bachelor|transfer/.test(t)) return 'Entertainment';
+  if (/covid|vaccine|virus|pandemic|fda|drug|cancer|health/.test(t)) return 'Health';
+  if (/ai|openai|gpt|anthropic|google|apple|microsoft|tesla|spacex|tech/.test(t)) return 'Tech';
+  return 'Other';
+}
+
+function scoreFlags(wallet) {
+  const flags = [];
+  const pct = wallet.ownershipPct;
+  const spent = wallet.totalSpent;
+  const age = wallet.walletAgeDays;
+  const trades = wallet.tradeCount;
+
+  if (pct >= 30) flags.push({cls:'flag-red', label:'DOMINANT'});
+  else if (pct >= 15) flags.push({cls:'flag-amber', label:'LARGE HOLDER'});
+
+  if (age !== null && age < 30) flags.push({cls:'flag-red', label:'NEW WALLET'});
+  else if (age !== null && age < 90) flags.push({cls:'flag-amber', label:'RECENT'});
+
+  if (trades <= 2) flags.push({cls:'flag-amber', label:'FEW TRADES'});
+  if (trades === 1) flags.push({cls:'flag-red', label:'SINGLE BET'});
+
+  if (spent >= 100_000) flags.push({cls:'flag-blue', label:'WHALE'});
+
+  return flags;
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id === `pane-${tab}`));
+};
+
+// ── TAB 1: Market Lookup ──────────────────────────────────────────────────────
+
+window.clearMarket = function() {
+  document.getElementById('marketInput').value = '';
+  document.getElementById('marketResult').innerHTML = '';
+};
+
+function extractConditionId(input) {
+  input = input.trim();
+  // Full condition ID
+  if (/^0x[0-9a-f]{60,66}$/i.test(input)) return input;
+  // URL: try to find conditionId param or slug
+  // Try fetching by slug from Gamma if it's a URL
+  return null;
+}
+
+async function resolveMarket(input) {
+  input = input.trim();
+
+  // Direct condition ID
+  if (/^0x[0-9a-f]{40,}$/i.test(input)) {
+    const data = await rest(`/gamma/markets?condition_id=${input}`);
+    if (data && data.length) return data[0];
+    throw new Error('Market not found for condition ID');
+  }
+
+  const eventMatch = input.match(/polymarket\.com\/event\/([^?#]+)/);
+  const mslugMatch = input.match(/polymarket\.com\/market\/([^/?#]+)/);
+
+  if (eventMatch) {
+    // URL may be /event/event-slug or /event/event-slug/market-slug
+    const fullPath = eventMatch[1].replace(/\/$/, '');
+    const parts = fullPath.split('/');
+    const eventSlug = parts[0];
+    const marketSlug = parts[1] || null;
+
+    // Try specific market slug first
+    if (marketSlug) {
+      const mdata = await rest(`/gamma/markets?slug=${marketSlug}`);
+      if (mdata && mdata.length) return mdata[0];
+    }
+
+    // Try as event — may have multiple child markets
+    const edata = await rest(`/gamma/events?slug=${eventSlug}`);
+    if (edata && edata.length) {
+      const event = edata[0];
+      const markets = event.markets || [];
+      if (markets.length === 1) return markets[0];
+      if (markets.length > 1) {
+        return { multiMarket: true, markets, eventTitle: event.title || eventSlug };
+      }
+    }
+
+    // Fall back to direct market slug
+    const mdata2 = await rest(`/gamma/markets?slug=${eventSlug}`);
+    if (mdata2 && mdata2.length) return mdata2[0];
+    throw new Error('Market not found for URL');
+  }
+
+  if (mslugMatch) {
+    const slug = mslugMatch[1];
+    const data = await rest(`/gamma/markets?slug=${slug}`);
+    if (data && data.length) return data[0];
+    throw new Error('Market not found for URL');
+  }
+
+  throw new Error('Could not parse input — paste a full Polymarket URL or condition ID (0x...)');
+}
+
+window.lookupMarket = async function() {
+  const input = document.getElementById('marketInput').value;
+  if (!input.trim()) return;
+  document.getElementById('marketBtn').disabled = true;
+  setStatus('Resolving market...');
+  const el = document.getElementById('marketResult');
+  el.innerHTML = `<div class="state-row"><span class="spinner-inline"></span>Resolving...</div>`;
+  try {
+    const resolved = await resolveMarket(input);
+    const markets = resolved.multiMarket ? resolved.markets : [resolved];
+    const eventTitle = resolved.multiMarket ? resolved.eventTitle : null;
+    await fetchAndRenderMarkets(markets, eventTitle);
+  } catch (err) {
+    el.innerHTML = `<div class="state-row" style="color:var(--red)">Error: ${err.message}</div>`;
+    clearStatus();
+  } finally {
+    document.getElementById('marketBtn').disabled = false;
+  }
+};
+
+// Fetch all markets in parallel, flatten into one row-per-wallet-per-outcome table
+async function fetchAndRenderMarkets(markets, eventTitle) {
+  const el = document.getElementById('marketResult');
+  const totalVol = markets.reduce((s,m) => s + parseFloat(m.volumeNum || m.volume || 0), 0);
+  const category = inferCategory(markets[0].question || markets[0].title || '');
+
+  setStatus(`Fetching trades for ${markets.length} market${markets.length>1?'s':''}...`);
+  el.innerHTML = `<div class="state-row"><span class="spinner-inline"></span>Fetching trades across ${markets.length} market${markets.length>1?'s':''}...</div>`;
+
+  // Fetch all markets in parallel
+  const allRows = []; // { addr, name, outcome, marketLabel, marketVolume, spent, tradeCount, firstTs }
+  let totalTrades = 0;
+
+  await Promise.all(markets.map(async (market) => {
+    const conditionId = market.conditionId || market.condition_id;
+    const marketLabel = market.question || market.title || conditionId.slice(0,10);
+    const marketVolume = parseFloat(market.volumeNum || market.volume || 0);
+    try {
+      const trades = await rest(`/dataapi/trades?market=${conditionId}&limit=1000&side=BUY&sort=size&sortDirection=DESC`);
+      totalTrades += trades.length;
+
+      // Per-market: aggregate by wallet+outcome
+      const buckets = {}; // key: addr|outcome
+      for (const trade of trades) {
+        const addr = trade.proxyWallet.toLowerCase();
+        const outcome = trade.outcome || (trade.outcomeIndex === 0 ? 'Yes' : 'No');
+        const key = `${addr}|${outcome}`;
+        if (!buckets[key]) {
+          buckets[key] = { addr, name: trade.name || '', outcome, marketLabel, marketVolume, conditionId, spent: 0, tradeCount: 0, firstTs: trade.timestamp, lastTs: trade.timestamp };
+        }
+        buckets[key].spent += trade.size * trade.price;
+        buckets[key].tradeCount++;
+        if (trade.timestamp < buckets[key].firstTs) buckets[key].firstTs = trade.timestamp;
+        if (trade.timestamp > buckets[key].lastTs) buckets[key].lastTs = trade.timestamp;
+      }
+      allRows.push(...Object.values(buckets));
+    } catch (e) {
+      console.warn(`Skipping ${marketLabel}: ${e.message}`);
+    }
+  }));
+
+  // Sort by spent desc, slice top 100
+  allRows.sort((a,b) => b.spent - a.spent);
+  const rows = allRows.slice(0, 100);
+
+  // Fetch splits for top 20 unique wallets — used for lifetime trade count concentration signal
+  setStatus('Checking wallet history...');
+  const walletMeta = {}; // addr -> { lifetimeTrades }
+  const uniqueAddrs = [...new Set(rows.slice(0,20).map(r => r.addr))];
+  await Promise.all(uniqueAddrs.map(async addr => {
+    try {
+      const splits = await fetchWalletSplits(addr);
+      walletMeta[addr] = { lifetimeTrades: splits.length };
+    } catch {}
+  }));
+
+  renderFlatTable(rows, walletMeta, { eventTitle, totalVol, category, marketCount: markets.length, totalTrades });
+  setStatus(`Done — ${rows.length} positions found`);
+  clearStatus();
+}
+
+function renderFlatTable(rows, walletMeta, meta) {
+  const flaggedCount = rows.filter(r => {
+    const pct = r.marketVolume > 0 ? (r.spent / r.marketVolume) * 100 : 0;
+    const wm = walletMeta[r.addr] || {};
+    const mktConc = wm.lifetimeTrades > 0 ? r.tradeCount / wm.lifetimeTrades : 0;
+    return pct >= 30 || r.tradeCount === 1 || mktConc >= 0.5;
+  }).length;
+
+  const top5pct = rows.slice(0,5).reduce((s,r) => s + (r.marketVolume > 0 ? r.spent/r.marketVolume*100 : 0), 0) / Math.min(rows.length, 5);
+  const displayTitle = meta.eventTitle || rows[0]?.marketLabel || 'Market';
+
+  let html = `
+    <div class="market-card" style="flex-direction:column;gap:10px">
+      <div class="market-card-title">${displayTitle}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em">Category:</span>
+        <strong class="cat-${meta.category}" style="font-family:var(--mono);font-size:11px">${meta.category}</strong>
+        <span style="color:var(--border);margin:0 2px">|</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="display:inline-flex;flex-direction:column;align-items:center;background:var(--bg);border:1px solid var(--border);padding:4px 10px;min-width:60px">
+            <span style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text)">${fmt(meta.totalVol)}</span>
+            <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-top:1px">Volume</span>
+          </div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center;background:var(--bg);border:1px solid var(--border);padding:4px 10px;min-width:60px">
+            <span style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--red)">${flaggedCount}</span>
+            <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-top:1px">Flagged</span>
+          </div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center;background:var(--bg);border:1px solid var(--border);padding:4px 10px;min-width:60px">
+            <span style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text)">${rows.length}</span>
+            <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-top:1px">Positions</span>
+          </div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center;background:var(--bg);border:1px solid var(--border);padding:4px 10px;min-width:60px">
+            <span style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text)">${meta.totalTrades}</span>
+            <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-top:1px">Trades</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-label">Position Holders</div>
+      <div class="section-desc">One row per wallet per outcome · ranked by spend</div>
+      <div class="section-meta">Showing top ${rows.length}</div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Wallet</th>
+          <th>Outcome</th>
+          <th>Spent</th>
+          <th>% of Mkt</th>
+          <th>Trades</th>
+          <th>Signals</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  rows.forEach((r, i) => {
+    const ownershipPct = r.marketVolume > 0 ? (r.spent / r.marketVolume) * 100 : 0;
+    const wm = walletMeta[r.addr] || {};
+    const lifetimeTrades = wm.lifetimeTrades ?? null;
+    // Concentration: trades in this market vs lifetime trades
+    const mktConcentration = lifetimeTrades > 0 ? r.tradeCount / lifetimeTrades : null;
+
+    const flags = scoreFlags({ ownershipPct, totalSpent: r.spent, walletAgeDays: null, tradeCount: r.tradeCount });
+    // Add concentration signal if >50% of lifetime trades are in this market
+    if (mktConcentration !== null && mktConcentration >= 0.5 && lifetimeTrades >= 5) {
+      flags.push({ cls: 'flag-red', label: `${Math.round(mktConcentration*100)}% OF HISTORY` });
+    } else if (mktConcentration !== null && mktConcentration >= 0.25 && lifetimeTrades >= 5) {
+      flags.push({ cls: 'flag-amber', label: `${Math.round(mktConcentration*100)}% OF HISTORY` });
+    }
+
+    const flagsHtml = flags.map(f => `<span class="flag ${f.cls}">${f.label}</span>`).join('');
+    const isFlagged = flags.some(f => f.cls === 'flag-red');
+    const isWarning = !isFlagged && flags.some(f => f.cls === 'flag-amber');
+    const barPct = Math.min(ownershipPct, 100);
+    const barCls = ownershipPct >= 20 ? 'red' : ownershipPct >= 10 ? 'amber' : 'green';
+    const outcomeCls = r.outcome === 'Yes' ? 'flag-green' : r.outcome === 'No' ? 'flag-red' : 'flag-gray';
+    const outcomeLabel = r.marketLabel && meta.marketCount > 1
+      ? `${r.marketLabel.replace(/^Will /, '').replace(/ perform.*$/, '')} — ${r.outcome}`
+      : r.outcome;
+
+    const rankCell = isFlagged
+      ? `<td style="width:36px;text-align:center">
+           <div style="display:flex;flex-direction:column;align-items:center;gap:1px">
+             <span style="color:var(--red);font-size:13px;line-height:1">⚑</span>
+             <span style="font-family:var(--mono);font-size:9px;color:var(--red);font-weight:600;letter-spacing:.04em">FLAG</span>
+           </div>
+         </td>`
+      : isWarning
+      ? `<td style="width:36px;text-align:center">
+           <div style="display:flex;flex-direction:column;align-items:center;gap:1px">
+             <span style="color:var(--amber);font-size:13px;line-height:1">⚑</span>
+             <span style="font-family:var(--mono);font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.04em">WARN</span>
+           </div>
+         </td>`
+      : `<td class="mono" style="color:var(--text-3);width:36px;text-align:center">${i+1}</td>`;
+
+    html += `
+      <tr>
+        ${rankCell}
+        <td class="addr" style="white-space:nowrap;max-width:140px;overflow:hidden">
+          ${addrLink(r.addr)}
+          ${r.name ? `<span style="color:var(--text-3);font-size:10px;margin-left:3px">${r.name.slice(0,8)}</span>` : ''}
+          <button onclick="exploreWallet('${r.addr}')" style="background:var(--green);border:none;cursor:pointer;color:#fff;font-size:9px;font-family:var(--mono);font-weight:600;padding:1px 5px;margin-left:3px;border-radius:2px;line-height:14px;vertical-align:middle" title="Explore wallet">↗</button>
+        </td>
+        <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${outcomeLabel}">
+          <span class="flag ${outcomeCls}" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;display:inline-block">${outcomeLabel}</span>
+        </td>
+        <td class="num"><span class="val-neutral">${fmt(r.spent)}</span></td>
+        <td>
+          <div class="bar-cell">
+            <div class="bar-track"><div class="bar-fill ${barCls}" style="width:${barPct}%"></div></div>
+            <span class="bar-val">${fmtPct(ownershipPct)}</span>
+          </div>
+        </td>
+        <td class="num mono">${r.tradeCount}</td>
+        <td><div class="flags">${flagsHtml || '<span style="color:var(--text-3);font-size:10px">—</span>'}</div></td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById('marketResult').innerHTML = html;
+}
+
+// ── TAB 2: Wallet Lookup ──────────────────────────────────────────────────────
+
+window.loadSpecificMarket = async function(conditionId) {
+  document.getElementById('marketInput').value = conditionId;
+  document.getElementById('marketBtn').disabled = true;
+  try {
+    const data = await rest(`/gamma/markets?condition_id=${conditionId}`);
+    if (!data || !data.length) throw new Error('Market not found');
+    await fetchAndRenderMarkets([data[0]], null);
+  } catch (err) {
+    document.getElementById('marketResult').innerHTML = `<div class="state-row" style="color:var(--red)">Error: ${err.message}</div>`;
+    clearStatus();
+  } finally {
+    document.getElementById('marketBtn').disabled = false;
+  }
+};
+
+window.clearWallet = function() {
+  document.getElementById('walletInput').value = '';
+  document.getElementById('walletResult').innerHTML = '';
+};
+
+window.lookupWallet = async function() {
+  const addr = document.getElementById('walletInput').value.trim().toLowerCase();
+  if (!addr || !/^0x[0-9a-f]{40}$/i.test(addr)) {
+    document.getElementById('walletResult').innerHTML = `<div class="state-row" style="color:var(--red)">Invalid wallet address</div>`;
+    return;
+  }
+
+  const btn = document.getElementById('walletBtn');
+  btn.disabled = true;
+  setStatus('Fetching wallet data...');
+
+  const el = document.getElementById('walletResult');
+  el.innerHTML = `<div class="state-row"><span class="spinner-inline"></span>Fetching wallet history...</div>`;
+
+  try {
+    // Fetch PnL positions
+    const pnlData = await gql(ENDPOINTS.pnl, `
+      query WalletPnl($user: String!, $count: Int!) {
+        userPositions(
+          first: $count
+          where: { user: $user }
+          orderBy: totalBought
+          orderDirection: desc
+        ) {
+          tokenId amount avgPrice realizedPnl totalBought
+        }
+      }
+    `, { user: addr, count: 200 });
+
+    const positions = pnlData.userPositions.map(p => ({
+      tokenId: p.tokenId,
+      amount: parseInt(p.amount) / 1e6,
+      avgPrice: parseInt(p.avgPrice) / 1e6,
+      realizedPnl: parseInt(p.realizedPnl) / 1e6,
+      totalBought: parseInt(p.totalBought) / 1e6,
+    }));
+
+    setStatus('Fetching wallet age...');
+    const splits = await fetchWalletSplits(addr);
+
+    setStatus('Fetching market metadata...');
+    const tokenIds = positions.slice(0, 30).map(p => p.tokenId);
+    const meta = await fetchMarketMetadataForTokens(tokenIds);
+
+    const totalSpent = positions.reduce((s,p) => s + p.totalBought, 0);
+    const totalPnl = positions.reduce((s,p) => s + p.realizedPnl, 0);
+    const walletAgeDays = splits.length ? Math.round((Date.now()/1000 - splits[0].timestamp) / 86400) : null;
+    const winCount = positions.filter(p => p.realizedPnl > 0).length;
+    const lossCount = positions.filter(p => p.realizedPnl < 0).length;
+
+    renderWalletResult(addr, positions, meta, splits, {
+      totalSpent, totalPnl, walletAgeDays, winCount, lossCount,
+    });
+
+    clearStatus();
+  } catch (err) {
+    el.innerHTML = `<div class="state-row" style="color:var(--red)">Error: ${err.message}</div>`;
+    clearStatus();
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+function renderWalletResult(addr, positions, meta, splits, stats) {
+  const ageCls = stats.walletAgeDays !== null && stats.walletAgeDays < 30 ? 'style="color:var(--red)"' : '';
+
+  let html = `
+    <div class="wallet-profile">
+      <div class="wp-stat">
+        <div class="wp-val">${fmt(stats.totalSpent)}</div>
+        <div class="wp-label">Total Spent</div>
+      </div>
+      <div class="wp-stat">
+        <div class="wp-val ${stats.totalPnl >= 0 ? 'val-pos' : 'val-neg'}">${fmt(stats.totalPnl)}</div>
+        <div class="wp-label">Realized PnL</div>
+      </div>
+      <div class="wp-stat">
+        <div class="wp-val">${positions.length}</div>
+        <div class="wp-label">Positions</div>
+      </div>
+      <div class="wp-stat">
+        <div class="wp-val" ${ageCls}>${stats.walletAgeDays !== null ? stats.walletAgeDays + 'd' : '—'}</div>
+        <div class="wp-label">Wallet Age</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-label">Position History</div>
+      <div class="section-desc">
+        <a href="https://polymarket.com/profile/${addr}" target="_blank" style="color:var(--blue);font-family:var(--mono);font-size:11px">${addr.slice(0,10)}…${addr.slice(-6)} ↗</a>
+      </div>
+      <div class="section-meta">${positions.length} positions · ${stats.winCount}W ${stats.lossCount}L</div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Market</th>
+          <th>Category</th>
+          <th>Side</th>
+          <th>Spent</th>
+          <th>Avg Price</th>
+          <th>Realized PnL</th>
+          <th>ROI</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  positions.slice(0, 50).forEach((p, i) => {
+    const m = meta[p.tokenId] || { title: 'Unknown', category: 'Unknown' };
+    const roi = p.totalBought > 0 ? (p.realizedPnl / p.totalBought) * 100 : 0;
+    const roiCls = roi > 0 ? 'val-pos' : roi < 0 ? 'val-neg' : 'val-neutral';
+    const status = p.amount > 0.01 ? 'OPEN' : p.realizedPnl > 0 ? 'WON' : p.realizedPnl < 0 ? 'LOST' : 'CLOSED';
+    const statusCls = status === 'WON' ? 'flag-green' : status === 'LOST' ? 'flag-red' : status === 'OPEN' ? 'flag-blue' : 'flag-gray';
+    const avgDisplay = p.avgPrice > 0 && p.avgPrice <= 1 ? `${(p.avgPrice * 100).toFixed(1)}¢` : '—';
+    // Infer Yes/No from avgPrice — positions with price closer to outcome token value
+    // We use the market question + token metadata when available, otherwise show price
+    const sideLabel = p.avgPrice > 0 && p.avgPrice <= 1
+      ? (p.avgPrice >= 0.5 ? 'YES' : 'NO')
+      : '—';
+    const sideCls = sideLabel === 'YES' ? 'flag-green' : sideLabel === 'NO' ? 'flag-red' : 'flag-gray';
+
+    html += `
+      <tr>
+        <td class="mono" style="color:var(--text-3);width:28px">${i+1}</td>
+        <td style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.title}">${m.title}</td>
+        <td><span class="cat-${m.category}" style="font-family:var(--mono);font-size:11px">${m.category}</span></td>
+        <td><span class="flag ${sideCls}">${sideLabel}</span></td>
+        <td class="num"><span class="val-neutral">${fmt(p.totalBought)}</span></td>
+        <td class="num mono" style="color:var(--text-2)">${avgDisplay}</td>
+        <td class="num"><span class="${p.realizedPnl >= 0 ? 'val-pos' : 'val-neg'}">${p.realizedPnl > 0 ? '+' : ''}${fmt(p.realizedPnl)}</span></td>
+        <td class="num"><span class="${roiCls}">${roi > 0 ? '+' : ''}${roi.toFixed(1)}%</span></td>
+        <td><span class="flag ${statusCls}">${status}</span></td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById('walletResult').innerHTML = html;
+}
+
+// ── SHARED SCAN (Specialists + Fade) ─────────────────────────────────────────
+
+const CAT_COLORS = {
+  Politics:'#1a73e8', Sports:'#0a7a3a', Crypto:'#e37400',
+  Economics:'#7b1fa2', Entertainment:'#c2185b', Health:'#d93025',
+  Tech:'#1565c0', Other:'#5f6368', Unknown:'#9aa0a6',
+};
+
+const SPORT_COLORS = {
+  'NBA':'#c9082a', 'NFL':'#013369', 'MLB':'#002d72', 'NHL':'#555555',
+  'Soccer':'#0a7a3a', 'Tennis':'#8b6914', 'Golf':'#2d5a27',
+  'MMA/Boxing':'#8b0000', 'Racing':'#e10600', 'Other Sports':'#5f6368',
+};
+
+function inferSportSubcat(title) {
+  if (!title) return 'Other Sports';
+  const t = title.toLowerCase();
+  if (/\bnba\b|basketball/.test(t)) return 'NBA';
+  if (/\bnfl\b|super bowl/.test(t)) return 'NFL';
+  if (/\bmlb\b|baseball/.test(t)) return 'MLB';
+  if (/\bnhl\b|hockey/.test(t)) return 'NHL';
+  if (/soccer|epl|premier league|champions league|la liga|bundesliga|serie a|\bmls\b|fifa|world cup/.test(t)) return 'Soccer';
+  if (/tennis|wimbledon|us open|french open|australian open/.test(t)) return 'Tennis';
+  if (/\bgolf\b|\bpga\b|masters/.test(t)) return 'Golf';
+  if (/mma|ufc|boxing/.test(t)) return 'MMA/Boxing';
+  if (/nascar|formula 1|\bf1\b|racing/.test(t)) return 'Racing';
+  return 'Other Sports';
+}
+
+// Shared scan state
+let _scanCache = null;
+
+window.runScan = async function() {
+  // If we already have scan data, just re-render
+  if (_scanCache) {
+    renderSpecialists(_scanCache.specialists);
+    renderFaders(_scanCache.faders);
+    return;
+  }
+
+  // Disable both buttons
+  const specBtn = document.getElementById('specBtn');
+  const fadeBtn = document.getElementById('fadeBtn');
+  if (specBtn) { specBtn.disabled = true; specBtn.textContent = '⏳ Scanning...'; }
+  if (fadeBtn) { fadeBtn.disabled = true; fadeBtn.textContent = '⏳ Scanning...'; }
+
+  const activeEl = document.getElementById('specialistResult') || document.getElementById('fadeResult');
+  document.getElementById('specialistResult').innerHTML = `<div class="state-row"><span class="spinner-inline"></span>Seeding from top-volume positions...</div>`;
+  document.getElementById('fadeResult').innerHTML = `<div class="state-row"><span class="spinner-inline"></span>Scan running on Specialists tab...</div>`;
+
+  try {
+    // ── Step 1: Seed via indexed realizedPnl — fetch top winners AND top losers ──
+    // totalBought is not indexed so ORDER BY totalBought times out at offset > 0.
+    // realizedPnl IS indexed. Two queries: best PnL desc, worst PnL asc.
+    setStatus('[1/3] Fetching top winners and losers...');
+    const WINNERS_QUERY = `{
+      userPositions(
+        first: 1000
+        orderBy: realizedPnl
+        orderDirection: desc
+      ) { user tokenId amount avgPrice realizedPnl totalBought }
+    }`;
+    const LOSERS_QUERY = `{
+      userPositions(
+        first: 1000
+        orderBy: realizedPnl
+        orderDirection: asc
+      ) { user tokenId amount avgPrice realizedPnl totalBought }
+    }`;
+    const [winnersData, losersData] = await Promise.all([
+      gql(ENDPOINTS.pnl, WINNERS_QUERY),
+      gql(ENDPOINTS.pnl, LOSERS_QUERY),
+    ]);
+
+    // Merge + deduplicate by user+tokenId (winners and losers may overlap for mid-range positions)
+    const seen = new Set();
+    const allPositions = [];
+    for (const pos of [...winnersData.userPositions, ...losersData.userPositions]) {
+      const key = `${pos.user}:${pos.tokenId}`;
+      if (!seen.has(key)) { seen.add(key); allPositions.push(pos); }
+    }
+
+    // ── Step 2: Group by wallet ──
+    const walletMap = new Map();
+    for (const pos of allPositions) {
+      const addr = pos.user.toLowerCase();
+      if (!walletMap.has(addr)) walletMap.set(addr, []);
+      walletMap.get(addr).push({
+        tokenId: pos.tokenId,
+        amount: parseInt(pos.amount) / 1e6,
+        avgPrice: parseInt(pos.avgPrice) / 1e6,
+        realizedPnl: parseInt(pos.realizedPnl) / 1e6,
+        totalBought: parseInt(pos.totalBought) / 1e6,
+      });
+    }
+
+    // Top 200 wallets by total volume represented in seed
+    const topWallets = Array.from(walletMap.entries())
+      .map(([addr, positions]) => ({
+        addr,
+        positions,
+        totalVolume: positions.reduce((s, p) => s + p.totalBought, 0),
+      }))
+      .sort((a, b) => b.totalVolume - a.totalVolume)
+      .slice(0, 200);
+
+    setStatus(`[2/3] Fetching market metadata for ${topWallets.length} wallets...`);
+
+    // ── Step 3: Enrich with market metadata + score ──
+    const specialists = [];
+    const faders = [];
+    let done = 0;
+
+    for (const { addr, positions } of topWallets) {
+      const tokenIds = [...new Set(positions.map(p => p.tokenId))];
+      const marketMeta = await fetchMarketMetadataForTokens(tokenIds.slice(0, 20)); // cap metadata fetches
+
+      // True lifetime stats from seed positions
+      const lifetimePnl = positions.reduce((s, p) => s + p.realizedPnl, 0);
+      const totalVolume = positions.reduce((s, p) => s + p.totalBought, 0);
+      const closed = positions.filter(p => p.amount < 0.01);
+      const wins = closed.filter(p => p.realizedPnl > 0).length;
+      const losses = closed.filter(p => p.realizedPnl <= 0).length;
+      const roi = totalVolume > 0 ? (lifetimePnl / totalVolume) * 100 : 0;
+
+      // Category concentration
+      const categorySpend = {};
+      for (const p of positions) {
+        const cat = marketMeta[p.tokenId]?.category || inferCategory(marketMeta[p.tokenId]?.title || '');
+        categorySpend[cat] = (categorySpend[cat] || 0) + p.totalBought;
+      }
+      const [dominantCategory, dominantSpend] = Object.entries(categorySpend)
+        .sort((a, b) => b[1] - a[1])[0] || ['Unknown', 0];
+      const concentration = totalVolume > 0 ? Math.round(dominantSpend / totalVolume * 100) : 0;
+
+      // Sport subcat
+      let sportSubcat = null;
+      if (dominantCategory === 'Sports') {
+        const subcatSpend = {};
+        for (const p of positions) {
+          const title = marketMeta[p.tokenId]?.title || '';
+          const sub = inferSportSubcat(title);
+          subcatSpend[sub] = (subcatSpend[sub] || 0) + p.totalBought;
+        }
+        sportSubcat = Object.entries(subcatSpend).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+      }
+
+      // Avg price (trading profile)
+      const avgPrice = positions.length > 0
+        ? positions.reduce((s, p) => s + p.avgPrice, 0) / positions.length
+        : 0;
+
+      const topMarket = positions
+        .sort((a, b) => b.totalBought - a.totalBought)[0];
+      const topMarketTitle = marketMeta[topMarket?.tokenId]?.title || '—';
+
+      const wallet = {
+        address: addr,
+        positions: positions.length,
+        totalVolume,
+        lifetimePnl,
+        roi,
+        wins,
+        losses,
+        concentration,
+        dominantCategory,
+        sportSubcat,
+        avgPrice,
+        topMarketTitle,
+        categorySpend,
+      };
+
+      // Specialist: profitable, concentrated
+      if (concentration >= 70 && lifetimePnl > 500 && positions.length >= 2) {
+        specialists.push(wallet);
+      }
+
+      // Fader: high volume, net negative, enough trades to be a pattern
+      if (lifetimePnl < -1000 && totalVolume > 5000 && closed.length >= 3) {
+        faders.push(wallet);
+      }
+
+      done++;
+      if (done % 20 === 0) setStatus(`[3/3] Scored ${done}/${topWallets.length} wallets...`);
+    }
+
+    specialists.sort((a, b) => b.lifetimePnl - a.lifetimePnl);
+    faders.sort((a, b) => a.lifetimePnl - b.lifetimePnl); // worst first
+
+    _scanCache = { specialists, faders };
+
+    renderSpecialists(specialists);
+    renderFaders(faders);
+
+    setStatus(`Done — ${specialists.length} specialists, ${faders.length} on fade list`);
+    clearStatus();
+
+  } catch (err) {
+    document.getElementById('specialistResult').innerHTML = `<div class="state-row" style="color:var(--red)">Error: ${err.message}</div>`;
+    document.getElementById('fadeResult').innerHTML = `<div class="state-row" style="color:var(--red)">Error: ${err.message}</div>`;
+    clearStatus();
+  } finally {
+    if (specBtn) { specBtn.disabled = false; specBtn.textContent = '↺ Re-Scan'; }
+    if (fadeBtn) { fadeBtn.disabled = false; fadeBtn.textContent = '↺ Re-Scan'; }
+  }
+};
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+
+function walletTable(wallets, { mode = 'specialist' } = {}) {
+  if (!wallets.length) return `<div class="state-row">No results.</div>`;
+
+  const pnlLabel = mode === 'fade' ? 'Lifetime Loss' : 'Lifetime PnL';
+
+  let html = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Wallet</th>
+          <th>Category</th>
+          <th>Concentration</th>
+          <th>${pnlLabel}</th>
+          <th>ROI</th>
+          <th>Record</th>
+          <th>Volume</th>
+          <th>Top Market</th>
+        </tr>
+      </thead><tbody>
+  `;
+
+  for (const w of wallets) {
+    const cat = w.dominantCategory;
+    const displayCat = (cat === 'Sports' && w.sportSubcat) ? w.sportSubcat : cat;
+    const color = (cat === 'Sports' && w.sportSubcat)
+      ? (SPORT_COLORS[w.sportSubcat] || CAT_COLORS['Sports'])
+      : (CAT_COLORS[cat] || '#9aa0a6');
+
+    const barPct = Math.min(w.concentration, 100);
+    const pnlCls = w.lifetimePnl >= 0 ? 'val-pos' : 'val-neg';
+    const roiCls = w.roi >= 0 ? 'val-pos' : 'val-neg';
+    const total = w.wins + w.losses;
+    const winRate = total > 0 ? Math.round(w.wins / total * 100) : null;
+    const recordCls = winRate !== null ? (winRate >= 60 ? 'val-pos' : winRate <= 40 ? 'val-neg' : 'val-neutral') : '';
+
+    html += `
+      <tr>
+        <td style="white-space:nowrap">
+          ${exploreBtn(w.address)}
+          <span style="margin-left:6px">${addrLink(w.address)}</span>
+        </td>
+        <td><span style="font-family:var(--mono);font-size:11px;color:${color};font-weight:600">${displayCat}</span></td>
+        <td>
+          <div class="bar-cell">
+            <div class="bar-track"><div class="bar-fill" style="width:${barPct}%;background:${color}"></div></div>
+            <span class="bar-val">${w.concentration}%</span>
+          </div>
+        </td>
+        <td class="num"><span class="${pnlCls}">${w.lifetimePnl > 0 ? '+' : ''}${fmt(w.lifetimePnl)}</span></td>
+        <td class="num"><span class="${roiCls}">${w.roi > 0 ? '+' : ''}${w.roi.toFixed(1)}%</span></td>
+        <td class="num mono">
+          <span class="${recordCls}">${total > 0 ? `${w.wins}W–${w.losses}L` : '—'}</span>
+          ${winRate !== null ? `<span style="color:var(--text-3);font-size:10px;margin-left:3px">${winRate}%</span>` : ''}
+        </td>
+        <td class="num mono" style="color:var(--text-2)">${fmt(w.totalVolume)}</td>
+        <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:var(--text-2)" title="${w.topMarketTitle}">${w.topMarketTitle}</td>
+      </tr>
+    `;
+  }
+
+  html += `</tbody></table>`;
+  return html;
+}
+
+function sidebarFilters(wallets, filterPrefix, onchange) {
+  const cats = [...new Set(wallets.map(w => w.dominantCategory))].sort();
+  const sportSubcats = [...new Set(wallets.filter(w => w.sportSubcat).map(w => w.sportSubcat))].sort();
+  const hasSports = wallets.some(w => w.dominantCategory === 'Sports');
+
+  const catHtml = cats.map(c => `
+    <label class="filter-option">
+      <input type="checkbox" checked data-filter="cat" data-val="${c}" onchange="${onchange}()">
+      <span class="cat-dot dot-${c}"></span>
+      <span>${c}</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text-3)">${wallets.filter(w => w.dominantCategory === c).length}</span>
+    </label>
+  `).join('');
+
+  const sportHtml = hasSports ? `
+    <div class="filter-group">
+      <div class="filter-label">Sport</div>
+      <div class="filter-options" id="${filterPrefix}SportFilters">
+        ${sportSubcats.map(s => `
+          <label class="filter-option">
+            <input type="checkbox" checked data-filter="sport" data-val="${s}" onchange="${onchange}()">
+            <span>${s}</span>
+            <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text-3)">${wallets.filter(w => w.sportSubcat === s).length}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="sidebar-filters">
+      <div class="filter-group">
+        <div class="filter-label">Category</div>
+        <div class="filter-options" id="${filterPrefix}CatFilters">${catHtml}</div>
+      </div>
+      ${sportHtml}
+      <div class="filter-group">
+        <div class="filter-label">Min Volume</div>
+        <div class="filter-options">
+          <label class="filter-option"><input type="radio" name="${filterPrefix}Vol" value="0" checked onchange="${onchange}()"> Any</label>
+          <label class="filter-option"><input type="radio" name="${filterPrefix}Vol" value="10000" onchange="${onchange}()"> $10K+</label>
+          <label class="filter-option"><input type="radio" name="${filterPrefix}Vol" value="100000" onchange="${onchange}()"> $100K+</label>
+          <label class="filter-option"><input type="radio" name="${filterPrefix}Vol" value="1000000" onchange="${onchange}()"> $1M+</label>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Specialists ───────────────────────────────────────────────────────────────
+
+function renderSpecialists(specialists) {
+  const el = document.getElementById('specialistResult');
+  if (!specialists.length) {
+    el.innerHTML = `<div class="state-row">No specialists found — try Re-Scan.</div>`;
+    return;
+  }
+  window._specialists = specialists;
+  el.innerHTML = `
+    <div class="two-col">
+      ${sidebarFilters(specialists, 'spec', 'filterSpecialists')}
+      <div id="specTable">
+        <div class="section-head">
+          <div class="section-label">Specialists</div>
+          <div class="section-desc">Profitable · category-concentrated · seeded by volume</div>
+          <div class="section-meta">${specialists.length} wallets</div>
+        </div>
+        ${walletTable(specialists, { mode: 'specialist' })}
+      </div>
+    </div>
+  `;
+}
+
+window.filterSpecialists = function() {
+  const s = window._specialists;
+  if (!s) return;
+  const filtered = applyFilters(s, 'spec');
+  document.getElementById('specTable').innerHTML = `
+    <div class="section-head">
+      <div class="section-label">Specialists</div>
+      <div class="section-desc">Profitable · category-concentrated · seeded by volume</div>
+      <div class="section-meta">${filtered.length} wallets</div>
+    </div>
+    ${walletTable(filtered, { mode: 'specialist' })}
+  `;
+};
+
+// ── Faders ────────────────────────────────────────────────────────────────────
+
+function renderFaders(faders) {
+  const el = document.getElementById('fadeResult');
+  if (!faders.length) {
+    el.innerHTML = `<div class="state-row">No fade candidates found.</div>`;
+    return;
+  }
+  window._faders = faders;
+  el.innerHTML = `
+    <div class="two-col">
+      ${sidebarFilters(faders, 'fade', 'filterFaders')}
+      <div id="fadeTable">
+        <div class="section-head">
+          <div class="section-label" style="background:var(--red)">Fade List</div>
+          <div class="section-desc">High volume · consistent net losers · bet against these</div>
+          <div class="section-meta">${faders.length} wallets</div>
+        </div>
+        ${walletTable(faders, { mode: 'fade' })}
+      </div>
+    </div>
+  `;
+}
+
+window.filterFaders = function() {
+  const f = window._faders;
+  if (!f) return;
+  const filtered = applyFilters(f, 'fade');
+  document.getElementById('fadeTable').innerHTML = `
+    <div class="section-head">
+      <div class="section-label" style="background:var(--red)">Fade List</div>
+      <div class="section-desc">High volume · consistent net losers · bet against these</div>
+      <div class="section-meta">${filtered.length} wallets</div>
+    </div>
+    ${walletTable(filtered, { mode: 'fade' })}
+  `;
+};
+
+function applyFilters(wallets, prefix) {
+  const checkedCats = new Set(
+    [...document.querySelectorAll(`#${prefix}CatFilters input:checked`)].map(i => i.dataset.val)
+  );
+  const sportInputs = document.querySelectorAll(`#${prefix}SportFilters input[data-filter="sport"]`);
+  const checkedSports = sportInputs.length
+    ? new Set([...sportInputs].filter(i => i.checked).map(i => i.dataset.val))
+    : null;
+  const minVol = parseFloat(document.querySelector(`input[name="${prefix}Vol"]:checked`)?.value || 0);
+
+  return wallets.filter(w => {
+    if (!checkedCats.has(w.dominantCategory)) return false;
+    if (checkedSports && w.dominantCategory === 'Sports' && w.sportSubcat && !checkedSports.has(w.sportSubcat)) return false;
+    if (w.totalVolume < minVol) return false;
+    return true;
+  });
+}
+</script>
+
+</body>
