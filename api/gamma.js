@@ -1,15 +1,22 @@
 export default async function handler(req, res) {
-  const path = req.query.path || '';
-  const url = `https://gamma-api.polymarket.com${path}`;
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+
   try {
-    const response = await fetch(url, {
+    // Strip /api/gamma prefix, keep everything after including query string
+    const incoming = req.url; // e.g. /api/gamma/markets?slug=foo
+    const stripped = incoming.replace(/^\/api\/gamma/, '') || '/';
+    const url = `https://gamma-api.polymarket.com${stripped}`;
+
+    const upstream = await fetch(url, {
       method: req.method,
-      headers: { 'Content-Type': 'application/json' },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     });
-    const data = await response.json();
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(response.status).json(data);
+
+    const text = await upstream.text();
+    res.setHeader('Content-Type', 'application/json');
+    res.status(upstream.status).send(text);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
