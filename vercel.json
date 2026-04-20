@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/gamma/:path*", "destination": "/api/gamma/:path*" },
+    { "source": "/dataapi/:path*", "destination": "/api/dataapi/:path*" }
+  ],
+  "functions": {
+    "api/gamma.js": { "runtime": "nodejs20.x" },
+    "api/dataapi.js": { "runtime": "nodejs20.x" }
+  }
+}
